@@ -14,12 +14,13 @@ const (
 )
 
 type UpYunConfig struct {
-	Bucket    string
-	Operator  string
-	Password  string
-	Secret    string // deprecated
-	Hosts     map[string]string
-	UserAgent string
+	Bucket          string
+	Operator        string
+	Password        string
+	PasswordEncrypt bool
+	Secret          string // deprecated
+	Hosts           map[string]string
+	UserAgent       string
 }
 
 type UpYun struct {
@@ -32,7 +33,11 @@ func NewUpYun(config *UpYunConfig) *UpYun {
 	up := &UpYun{}
 	up.Bucket = config.Bucket
 	up.Operator = config.Operator
-	up.Password = md5Str(config.Password)
+	if config.PasswordEncrypt {
+		up.Password = config.Password
+	} else {
+		up.Password = md5Str(config.Password)
+	}
 	up.Secret = config.Secret
 	up.Hosts = config.Hosts
 	if config.UserAgent != "" {
