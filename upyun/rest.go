@@ -53,6 +53,8 @@ type GetObjectsConfig struct {
 	MaxListLevel int
 	// DescOrder:  whether list objects by desc-order
 	DescOrder bool
+	ListStart string
+	ListEnd   string
 
 	rootDir string
 	level   int
@@ -602,6 +604,14 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 			return errorOperation("list read body", err)
 		}
 		for _, fInfo := range files {
+			if config.ListStart != "" && strings.Compare(fInfo.Name, config.ListStart) < 0 {
+				// log.Printf("skip %s, start %s\n", fInfo.Name, config.ListStart)
+				continue
+			}
+			if config.ListEnd != "" && strings.Compare(fInfo.Name, config.ListEnd) > 0 {
+				// log.Printf("skip %s, end %s\n", fInfo.Name, config.ListEnd)
+				continue
+			}
 			if fInfo.IsDir && (config.level+1 < config.MaxListLevel || config.MaxListLevel == -1) {
 				rConfig := &GetObjectsConfig{
 					Path:           path.Join(config.Path, fInfo.Name),
