@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -53,6 +54,8 @@ type GetObjectsConfig struct {
 	MaxListLevel int
 	// DescOrder:  whether list objects by desc-order
 	DescOrder bool
+	ListStart string
+	ListEnd   string
 
 	rootDir string
 	level   int
@@ -602,15 +605,35 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 			return errorOperation("list read body", err)
 		}
 		for _, fInfo := range files {
+			p := path.Join(config.Path, fInfo.Name)
+			if config.ListStart != "" {
+				if strings.Compare(p, config.ListStart) < 0 {
+					if !fInfo.IsDir {
+						log.Printf("skip %s, start %s\n", p, config.ListStart)
+						continue
+					}
+
+					if !strings.HasPrefix(config.ListStart, p) {
+						log.Printf("skip %s, start %s\n", p, config.ListStart)
+						continue
+					}
+				}
+			}
+			if config.ListEnd != "" && strings.Compare(p, config.ListEnd) > 0 {
+				log.Printf("skip %s, end %s\n", p, config.ListEnd)
+				continue
+			}
 			if fInfo.IsDir && (config.level+1 < config.MaxListLevel || config.MaxListLevel == -1) {
 				rConfig := &GetObjectsConfig{
-					Path:           path.Join(config.Path, fInfo.Name),
+					Path:           p,
 					QuitChan:       config.QuitChan,
 					ObjectsChan:    config.ObjectsChan,
 					MaxListTries:   config.MaxListTries,
 					MaxListObjects: config.MaxListObjects,
 					DescOrder:      config.DescOrder,
 					MaxListLevel:   config.MaxListLevel,
+					ListStart:      config.ListStart,
+					ListEnd:        config.ListEnd,
 					level:          config.level + 1,
 					rootDir:        path.Join(config.rootDir, fInfo.Name),
 					try:            config.try,
