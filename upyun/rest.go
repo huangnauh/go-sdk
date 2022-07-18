@@ -611,8 +611,7 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 						// log.Printf("skip %s, start %s\n", p, config.ListStart)
 						continue
 					}
-
-					if !strings.HasPrefix(config.ListStart, p) {
+					if !strings.HasPrefix(config.ListStart, p+"/") {
 						// log.Printf("skip %s, start %s\n", p, config.ListStart)
 						continue
 					}
