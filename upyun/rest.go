@@ -617,7 +617,7 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 					}
 				}
 			}
-			if config.ListEnd != "" && strings.Compare(p, config.ListEnd) > 0 {
+			if config.ListEnd != "" && strings.Compare(p, config.ListEnd) >= 0 {
 				// log.Printf("skip %s, end %s\n", p, config.ListEnd)
 				continue
 			}
