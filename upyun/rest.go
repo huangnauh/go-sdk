@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 	"os"
@@ -609,18 +608,18 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 			if config.ListStart != "" {
 				if strings.Compare(p, config.ListStart) < 0 {
 					if !fInfo.IsDir {
-						log.Printf("skip %s, start %s\n", p, config.ListStart)
+						// log.Printf("skip %s, start %s\n", p, config.ListStart)
 						continue
 					}
 
 					if !strings.HasPrefix(config.ListStart, p) {
-						log.Printf("skip %s, start %s\n", p, config.ListStart)
+						// log.Printf("skip %s, start %s\n", p, config.ListStart)
 						continue
 					}
 				}
 			}
 			if config.ListEnd != "" && strings.Compare(p, config.ListEnd) > 0 {
-				log.Printf("skip %s, end %s\n", p, config.ListEnd)
+				// log.Printf("skip %s, end %s\n", p, config.ListEnd)
 				continue
 			}
 			if fInfo.IsDir && (config.level+1 < config.MaxListLevel || config.MaxListLevel == -1) {
