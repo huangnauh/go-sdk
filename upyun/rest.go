@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"path"
@@ -582,8 +581,8 @@ func (up *UpYun) List(config *GetObjectsConfig) error {
 		})
 
 		if err != nil {
-			var nerr net.Error
-			if ok := errors.As(err, &nerr); ok {
+			ae, _ := err.(*Error)
+			if ae == nil || ae.Code >= http.StatusInternalServerError {
 				config.try++
 				if config.MaxListTries == 0 || config.try < config.MaxListTries {
 					time.Sleep(10 * time.Millisecond)
